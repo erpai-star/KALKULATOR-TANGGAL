@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Tanggal Kalender</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .date-input-wrapper {
+            position: relative;
+        }
+
+        .date-input-wrapper input[type="date"] {
+            padding: 10px 15px;
+            color: #333;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .result-title {
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .result-date {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .info-text {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+
+            .result-details {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 Kalkulator Tanggal Kalender</h1>
+        <p class="subtitle">Hitung tanggal aktual berdasarkan jumlah hari dan tanggal mulai</p>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <div class="input-group">
+            <label for="startDate">Tanggal Mulai</label>
+            <div class="date-input-wrapper">
+                <input type="date" id="startDate" value="2024-01-01">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="daysToAdd">Jumlah Hari (contoh: 21 hari)</label>
+            <input type="number" id="daysToAdd" min="1" value="21" placeholder="Masukkan jumlah hari">
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="calculateDate()">Hitung Tanggal</button>
+            <button class="btn-secondary" onclick="resetForm()">Reset</button>
+        </div>
+
+        <div class="result-card" id="resultCard" style="display: none;">
+            <div class="result-title">Tanggal Aktual</div>
+            <div class="result-date" id="resultDate">-</div>
+            <div class="result-details">
+                <div class="detail-item">
+                    <div class="detail-label">Hari</div>
+                    <div class="detail-value" id="resultDay">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Tanggal Mulai</div>
+                    <div class="detail-value" id="resultStartDate">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Selisih Hari</div>
+                    <div class="detail-value" id="resultDaysAdded">-</div>
+                </div>
+            </div>
+        </div>
+
+        <p class="info-text">Masukkan tanggal mulai dan jumlah hari untuk menghitung tanggal aktualnya</p>
+    </div>
+
+    <script>
+        function calculateDate() {
+            // Ambil nilai input
+            const startDateInput = document.getElementById('startDate').value;
+            const daysToAdd = parseInt(document.getElementById('daysToAdd').value);
+            const errorMessage = document.getElementById('errorMessage');
+            const resultCard = document.getElementById('resultCard');
+
+            // Validasi input
+            if (!startDateInput) {
+                showError('Silakan pilih tanggal mulai');
+                return;
+            }
+
+            if (!daysToAdd || daysToAdd < 1) {
+                showError('Silakan masukkan jumlah hari yang valid (minimal 1)');
+                return;
+            }
+
+            // Sembunyikan error message jika ada
+            errorMessage.style.display = 'none';
+
+            // Buat objek Date dari input
+            const startDate = new Date(startDateInput);
+            startDate.setHours(0, 0, 0, 0); // Reset waktu ke tengah malam
+
+            // Hitung tanggal akhir
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + daysToAdd);
+
+            // Array nama hari dalam Bahasa Indonesia
+            const daysInIndonesian = [
+                'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'
+            ];
+
+            // Array nama bulan dalam Bahasa Indonesia
+            const monthsInIndonesian = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+
+            // Format tanggal untuk ditampilkan
+            function formatDateIndonesian(date) {
+                const dayName = daysInIndonesian[date.getDay()];
+                const day = date.getDate();
+                const month = monthsInIndonesian[date.getMonth()];
+                const year = date.getFullYear();
+                return `${dayName}, ${day} ${month} ${year}`;
+            }
+
+            // Format tanggal untuk detail
+            function formatDateShort(date) {
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+
+            // Update tampilan hasil
+            document.getElementById('resultDate').textContent = formatDateIndonesian(endDate);
+            document.getElementById('resultDay').textContent = daysInIndonesian[endDate.getDay()];
+            document.getElementById('resultStartDate').textContent = formatDateShort(startDate);
+            document.getElementById('resultDaysAdded').textContent = daysToAdd + ' hari';
+
+            // Tampilkan card hasil
+            resultCard.style.display = 'block';
+
+            // Animasi smooth scroll ke hasil
+            resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            document.getElementById('resultCard').style.display = 'none';
+        }
+
+        function resetForm() {
+            // Reset input ke nilai default
+            document.getElementById('startDate').value = '2024-01-01';
+            document.getElementById('daysToAdd').value = '21';
+            
+            // Sembunyikan error dan hasil
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('resultCard').style.display = 'none';
+        }
+
+        // Tambahkan event listener untuk input number agar tidak bisa kurang dari 1
+        document.getElementById('daysToAdd').addEventListener('input', function(e) {
+            if (this.value < 1) {
+                this.value = 1;
+            }
+        });
+
+        // Hitung otomatis saat halaman dimuat (opsional)
+        window.addEventListener('load', function() {
+            // Set default date to today
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            document.getElementById('startDate').value = `${year}-${month}-${day}`;
+            
+            // Optional: langsung hitung saat load
+            // calculateDate();
+        });
+    </script>
+</body>
+</html>
